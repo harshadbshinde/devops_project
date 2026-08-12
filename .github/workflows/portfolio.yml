@@ -1,4 +1,4 @@
-name: Portfolio Pipeline
+name: Docker Pipeline
 
 on:
   push:
