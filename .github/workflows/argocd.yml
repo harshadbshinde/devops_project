@@ -1,0 +1,57 @@
+name: ArgoCD
+
+on:
+  workflow_run:
+    workflows:
+      - "Terraform"
+    types:
+      - completed
+
+jobs:
+  argocd:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: self-hosted
+
+    steps:
+
+      - name: Install Argo CD CLI
+        shell: bash
+        run: |
+          curl -sSL -o argocd \
+            https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+
+          chmod +x argocd
+          sudo mv argocd /usr/local/bin/argocd
+
+      - name: Check Kubernetes
+        run: |
+          kubectl get nodes
+
+      - name: Start Argo CD Port Forward
+        shell: bash
+        run: |
+          kubectl port-forward svc/argocd-server \
+            -n argocd 8080:443 > argocd-port-forward.log 2>&1 &
+
+          sleep 10
+
+      - name: Check Argo CD
+        run: |
+          curl -k https://localhost:8080
+
+      - name: Argo CD Login
+        run: |
+          argocd login localhost:8080 \
+            --username admin \
+            --password "${{ secrets.ARGOCD_PASSWORD }}" \
+            --insecure
+
+      - name: Sync Argo CD Application
+        run: |
+          argocd app sync portfolio
+
+      - name: Wait for Argo CD
+        run: |
+          argocd app wait portfolio \
+            --sync \
+            --health

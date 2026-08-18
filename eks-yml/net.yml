@@ -5,7 +5,6 @@ kind: NetworkPolicy
 
 metadata:
   name: network-nginx
-  namespace: dev
  
 spec: 
   podSelector:
@@ -22,6 +21,3 @@ ingress:
      - port: 80 
 
 
-ingress: []                   
-
- 

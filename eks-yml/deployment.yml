@@ -1,5 +1,4 @@
 apiVersion: apps/v1
-
 kind: Deployment
 
 metadata:
@@ -14,13 +13,13 @@ spec:
 
   template:
     metadata:
-      name: my-pod
       labels:
         app: nginx
 
     spec:
       containers:
         - name: my-nginx
-          image: my-portfolio
+          image: shindeharshad/my-portfolio-image
+          imagePullPolicy: Always
           ports:
             - containerPort: 80

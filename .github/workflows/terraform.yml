@@ -1,0 +1,42 @@
+name: Terraform
+
+on:
+  workflow_run:
+    workflows:
+      - "Portfolio Docker Image"
+    types:
+      - completed
+
+env:
+  AWS_REGION: "ap-south-1"
+
+jobs:
+  terraform:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: checkout folder
+        uses: actions/checkout@v4
+
+      - name: authentication
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_1 }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY_1 }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Terraform install
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform init
+        run: terraform init
+        working-directory: environment/dev
+
+      - name: Terraform plan
+        run: terraform plan -out=tfplan
+        working-directory: environment/dev
+
+      - name: Terraform apply
+        run: terraform apply -auto-approve tfplan
+        working-directory: environment/dev
