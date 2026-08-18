@@ -1,9 +1,9 @@
-name: ArgoCD Application
+name: Terraform
 
 on:
   workflow_run:
     workflows:
-      - "Terraform"
+      - "Portfolio Docker Image"
     types:
       - completed
 
@@ -12,19 +12,17 @@ env:
   EKS_CLUSTER_NAME: "my-eks-cluster"
 
 jobs:
-  argocd-application:
-
+  terraform:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
-
     runs-on: ubuntu-22.04
 
     steps:
 
       # --------------------------------
-      # Checkout Source Code
+      # Checkout
       # --------------------------------
 
-      - name: Checkout Source Code
+      - name: Checkout folder
         uses: actions/checkout@v4
 
 
@@ -41,6 +39,26 @@ jobs:
 
 
       # --------------------------------
+      # Terraform
+      # --------------------------------
+
+      - name: Terraform install
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform init
+        run: terraform init
+        working-directory: environment/dev
+
+      - name: Terraform plan
+        run: terraform plan -out=tfplan
+        working-directory: environment/dev
+
+      - name: Terraform apply
+        run: terraform apply -auto-approve tfplan
+        working-directory: environment/dev
+
+
+      # --------------------------------
       # Connect kubectl to EKS
       # --------------------------------
 
@@ -50,16 +68,46 @@ jobs:
             --region ${{ env.AWS_REGION }} \
             --name ${{ env.EKS_CLUSTER_NAME }}
 
-
-      # --------------------------------
-      # Check EKS
-      # --------------------------------
-
       - name: Check EKS Cluster
         run: |
-          echo "Checking EKS cluster..."
-          kubectl get nodes --request-timeout=30s
-          kubectl cluster-info --request-timeout=30s
+          kubectl get nodes
+
+
+      # --------------------------------
+      # Create Argo CD Namespace
+      # --------------------------------
+
+      - name: Create Argo CD Namespace
+        run: |
+          kubectl create namespace argocd \
+            --dry-run=client \
+            -o yaml | kubectl apply -f -
+
+
+      # --------------------------------
+      # Install Argo CD in EKS
+      # --------------------------------
+
+      - name: Install Argo CD
+        run: |
+          kubectl apply \
+            -n argocd \
+            --server-side \
+            --force-conflicts \
+            -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+
+      # --------------------------------
+      # Wait for Argo CD
+      # --------------------------------
+
+      - name: Wait for Argo CD Server
+        run: |
+          kubectl wait \
+            --for=condition=Available \
+            deployment/argocd-server \
+            -n argocd \
+            --timeout=300s
 
 
       # --------------------------------
@@ -68,43 +116,5 @@ jobs:
 
       - name: Check Argo CD
         run: |
-          echo "Checking Argo CD namespace..."
-          kubectl get namespace argocd --request-timeout=30s
-
-          echo "Checking Argo CD Application CRD..."
-          kubectl get crd applications.argoproj.io --request-timeout=30s
-
-
-      # --------------------------------
-      # Apply Argo CD Application
-      # --------------------------------
-
-      - name: Apply Argo CD Application
-        run: |
-          echo "Applying Argo CD Application..."
-
-          timeout 60s kubectl apply \
-            --validate=false \
-            --request-timeout=30s \
-            -f argocd/application.yml
-
-          echo "Argo CD Application applied successfully."
-
-
-      # --------------------------------
-      # Check Argo CD Application
-      # --------------------------------
-
-      - name: Check Argo CD Application
-        run: |
-          echo "Checking Argo CD Application..."
-
-          kubectl get application portfolio \
-            -n argocd \
-            --request-timeout=30s
-
-          echo "Application status:"
-          kubectl get application portfolio \
-            -n argocd \
-            -o wide \
-            --request-timeout=30s
+          kubectl get pods -n argocd
+          kubectl get svc -n argocd
