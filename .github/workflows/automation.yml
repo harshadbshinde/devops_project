@@ -61,12 +61,14 @@ jobs:
 
 
       # --------------------------------
-      # Create Argo CD Application
+      # Create / Update Argo CD Application
       # --------------------------------
 
       - name: Apply Argo CD Application
         run: |
-          kubectl apply -f argocd/application.yml
+          kubectl apply \
+            --validate=false \
+            -f argocd/application.yml
 
 
       # --------------------------------
@@ -75,4 +77,4 @@ jobs:
 
       - name: Check Argo CD Application
         run: |
-          kubectl get applications -n argocd
+          kubectl get application portfolio -n argocd
