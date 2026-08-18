@@ -74,7 +74,7 @@ jobs:
 
 
       # --------------------------------
-      # Install Argo CD Namespace
+      # Create Argo CD Namespace
       # --------------------------------
 
       - name: Create Argo CD Namespace
@@ -118,86 +118,3 @@ jobs:
         run: |
           kubectl get pods -n argocd
           kubectl get svc -n argocd
-
-
-      # --------------------------------
-      # Install Argo CD CLI
-      # --------------------------------
-
-      - name: Install Argo CD CLI
-        run: |
-          VERSION=$(curl -L -s \
-            https://api.github.com/repos/argoproj/argo-cd/releases/latest \
-            | grep '"tag_name":' \
-            | cut -d '"' -f 4)
-
-          curl -sSL -o argocd \
-            "https://github.com/argoproj/argo-cd/releases/download/${VERSION}/argocd-linux-amd64"
-
-          chmod +x argocd
-
-          sudo mv argocd /usr/local/bin/argocd
-
-
-      # --------------------------------
-      # Check Argo CD CLI
-      # --------------------------------
-
-      - name: Check Argo CD CLI
-        run: |
-          argocd version --client
-
-
-      # --------------------------------
-      # Start Port Forward
-      # --------------------------------
-
-      - name: Start Argo CD Port Forward
-        run: |
-          kubectl port-forward \
-            svc/argocd-server \
-            -n argocd \
-            8080:443 > argocd-port-forward.log 2>&1 &
-
-          sleep 10
-
-
-      # --------------------------------
-      # Check Port Forward
-      # --------------------------------
-
-      - name: Check Argo CD Server
-        run: |
-          curl -k https://localhost:8080
-
-
-      # --------------------------------
-      # Argo CD Login
-      # --------------------------------
-
-      - name: Argo CD Login
-        run: |
-          argocd login localhost:8080 \
-            --username admin \
-            --password "${{ secrets.ARGOCD_PASSWORD }}" \
-            --insecure
-
-
-      # --------------------------------
-      # Sync Application
-      # --------------------------------
-
-      - name: Sync Argo CD Application
-        run: |
-          argocd app sync portfolio
-
-
-      # --------------------------------
-      # Wait for Application
-      # --------------------------------
-
-      - name: Wait for Argo CD Application
-        run: |
-          argocd app wait portfolio \
-            --sync \
-            --health
