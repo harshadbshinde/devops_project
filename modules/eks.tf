@@ -2,7 +2,7 @@ resource "aws_eks_cluster" "main" {
 
   name = var.cluster_name
 
-  role_arn = aws_iam_role.eks_cluster_role.arn
+  role_arn = data.aws_iam_role.eks_cluster_role.arn
 
   version = var.kubernetes_version
 
@@ -13,8 +13,7 @@ resource "aws_eks_cluster" "main" {
       aws_subnet.public2.id
     ]
 
-    endpoint_public_access = true
-
+    endpoint_public_access  = true
     endpoint_private_access = false
   }
 
