@@ -52,22 +52,6 @@ Kubernetes
    v
 Portfolio Application
 
-🛠️ Technologies Used
-Technology	Purpose
-GitHub	Source code management
-GitHub Actions	CI/CD automation
-Docker	Containerization
-Docker Hub	Docker image registry
-Terraform	Infrastructure as Code
-AWS	Cloud platform
-Amazon EKS	Managed Kubernetes cluster
-Kubernetes	Container orchestration
-Argo CD	GitOps continuous delivery
-kubectl	Kubernetes cluster management
-YAML	CI/CD and Kubernetes configuration
-HTML	Portfolio web application
-CSS	Application styling
-JavaScript	Application functionality
 📂 Project Structure
 portfolio-devops-automation/
 │
