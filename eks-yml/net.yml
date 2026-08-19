@@ -18,6 +18,6 @@ spec:
 
 ingress:
  - ports:                  
-     - port: 80 
+     - port: 8081
 
 
