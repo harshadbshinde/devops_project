@@ -93,6 +93,8 @@ portfolio-devops-automation/
 ├── Dockerfile
 ├── index.html
 └── README.md
+
+
 🔄 CI/CD Pipeline
 
 This project uses three GitHub Actions workflows.
@@ -184,6 +186,8 @@ Wait for Argo CD
        |
        v
 Check Argo CD
+
+
 ☁️ AWS Infrastructure
 
 Terraform is used to create the Kubernetes infrastructure in AWS.
@@ -244,6 +248,8 @@ Example checks:
 
 kubectl get pods -n argocd
 kubectl get svc -n argocd
+
+
 3️⃣ ArgoCD Application Automation Pipeline
 Workflow
 .github/workflows/automation.yml
@@ -279,6 +285,8 @@ kubectl apply \
 The application is checked using:
 
 kubectl get application portfolio -n argocd
+
+
 🔁 GitOps Deployment with Argo CD
 
 The project uses Argo CD to deploy Kubernetes resources from Git.
@@ -317,6 +325,8 @@ eks-yml/
 ├── deployment.yml
 ├── net.yml
 └── service.yml
+
+
 🚀 Deployment
 File
 eks-yml/deployment.yml
@@ -335,6 +345,8 @@ Kubernetes Deployment
     |
     v
 Portfolio Pod
+
+
 🌐 Service
 File
 eks-yml/service.yml
@@ -351,6 +363,8 @@ Portfolio Pod
   |
   v
 Container
+
+
 🔐 NetworkPolicy
 File
 eks-yml/net.yml
@@ -388,6 +402,8 @@ Portfolio Source Code
         |
         v
     Docker Hub
+
+
 🌐 Portfolio Application
 
 The Portfolio frontend contains:
@@ -519,6 +535,8 @@ Port forwarding is currently used as the local method for accessing the Argo CD 
              |
              v
        Portfolio Application
+
+
 📊 Automation Summary
 Process	Status
 Source code checkout	✅ Automated
@@ -540,6 +558,8 @@ Kubernetes Service	✅ Automated through Argo CD
 Kubernetes NetworkPolicy	✅ Automated through Argo CD
 Local kubeconfig	🔶 Manual
 Argo CD port forwarding	🔶 Manual
+
+
 🎯 Project Objectives
 
 This project demonstrates the following DevOps concepts:
@@ -556,6 +576,8 @@ GitOps using Argo CD
 Automated application deployment
 CI/CD workflow chaining
 Secure credential management using GitHub Secrets
+
+
 🚀 Future Improvements
 
 The project can be extended with the following improvements.
@@ -584,6 +606,7 @@ Argo CD
     |
     v
 EKS
+
 🔹 3. Monitoring
 
 Monitoring can be added using:
@@ -598,6 +621,7 @@ Pods
 CPU usage
 Memory usage
 Application health
+
 🔹 4. Security Improvements
 
 Additional security can include:
@@ -609,6 +633,7 @@ AWS Secrets Manager
 Container image scanning
 HTTPS/TLS
 Stronger NetworkPolicies
+
 🔹 5. Terraform Remote State
 
 Terraform state can be stored remotely using an AWS backend such as S3, with appropriate state-locking and versioning practices.
